@@ -18,7 +18,7 @@
         v-if="page != 1"
         @click="isLoading"
       >
-        &#60; Previous
+        <input type="button" value="Previous" />
       </router-link>
 
       <router-link
@@ -28,7 +28,7 @@
         v-if="hasNextPage"
         @click="isLoading"
       >
-        Next &#62;
+        <input type="button" value="Next" />
       </router-link>
     </div>
   </div>
@@ -42,21 +42,21 @@ import { watchEffect } from 'vue'
 export default {
   name: 'EventList',
   components: {
-    EventCard,
+    EventCard
   },
   props: ['page'],
   data() {
     return {
       events: null,
       totalEvents: 0,
-      showLoader: false,
+      showLoader: false
     }
   },
   computed: {
     hasNextPage() {
       var totalPages = Math.ceil(this.totalEvents / 2)
       return this.page < totalPages
-    },
+    }
   },
   created() {
     watchEffect(() => {
@@ -106,5 +106,10 @@ export default {
 
 #page-next {
   text-align: right;
+}
+
+input[type='button'] {
+  background-color: #8eebc1;
+  border-width: 0px;
 }
 </style>

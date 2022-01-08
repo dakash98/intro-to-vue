@@ -34,6 +34,7 @@
 import EventCard from '@/components/EventCard.vue'
 import EventService from '@/services/EventService.js'
 import { watchEffect } from 'vue'
+import Common from '@/services/Common.js'
 
 export default {
   name: 'EventList',
@@ -64,17 +65,7 @@ export default {
           this.showLoader = false
         })
         .catch(error => {
-          if (error.response && error.response.status == 404) {
-            this.$router.push({
-              name: '404Resource',
-              params: { resource: 'event' }
-            })
-          } else {
-            this.$router.push({
-              name: 'NetworkError',
-              params: { resource: 'event' }
-            })
-          }
+          Common.setUrlPath(this.$router, error)
         })
     })
   },

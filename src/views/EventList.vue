@@ -11,25 +11,21 @@
       />
     </div>
     <div class="pagination" v-else>
-      <router-link
-        id="page-prev"
-        :to="{ name: 'EventList', query: { page: page - 1 } }"
-        rel="prev"
-        v-if="page != 1"
-        @click="isLoading"
-      >
-        <input type="button" value="Previous" />
-      </router-link>
-
-      <router-link
-        id="page-next"
-        :to="{ name: 'EventList', query: { page: page + 1 } }"
-        rel="next"
-        v-if="hasNextPage"
-        @click="isLoading"
-      >
-        <input type="button" value="Next" />
-      </router-link>
+      <div class="align-center" v-for="p in getTotalPage()" :key="p">
+        <span v-if="p != page">
+          <router-link
+            :to="{ name: 'EventList', query: { page: p } }"
+            :disabled="true"
+            @click="isLoading"
+            class="add-margin"
+          >
+            <input type="button" :value="p" />
+          </router-link>
+        </span>
+        <span v-else>
+          <input type="button" :value="p" class="disabled" />
+        </span>
+      </div>
     </div>
   </div>
 </template>
@@ -49,12 +45,12 @@ export default {
     return {
       events: null,
       totalEvents: 0,
-      showLoader: false
+      showLoader: true
     }
   },
   computed: {
     hasNextPage() {
-      var totalPages = Math.ceil(this.totalEvents / 2)
+      var totalPages = this.getTotalPage()
       return this.page < totalPages
     }
   },
@@ -74,8 +70,10 @@ export default {
   },
   methods: {
     isLoading() {
-      console.log('loading')
       this.showLoader = !this.showLoader
+    },
+    getTotalPage() {
+      return Math.ceil(this.totalEvents / 2)
     }
   }
 }
@@ -94,22 +92,35 @@ export default {
   width: 290px;
 }
 
-.pagination a {
+.pagination div {
   flex: 1;
   text-decoration: none;
   color: #2c3e50;
 }
 
-#page-prev {
-  text-align: left;
+.add-margin {
+  margin: 0 5px 0 5px;
 }
 
-#page-next {
-  text-align: right;
+.align-center {
+  text-align: center;
 }
 
 input[type='button'] {
   background-color: #8eebc1;
   border-width: 0px;
+  padding: 5px 15px 5px 15px;
+  font-weight: bolder;
+}
+
+input[type='button']:hover {
+  transform: scale(1.3);
+}
+
+.disabled {
+  background-color: rgb(54, 53, 53) !important;
+  border-width: 0px;
+  padding: 5px 15px 5px 15px;
+  color: grey;
 }
 </style>

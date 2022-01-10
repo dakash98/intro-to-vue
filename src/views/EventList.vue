@@ -3,14 +3,7 @@
   <div class="events">
     <EventCard v-for="event in events" :key="event.id" :event="event" />
 
-    <div v-if="showLoader">
-      <img
-        src="dual_ring.gif"
-        alt="Computer man"
-        style="width: 100px; height: 100px"
-      />
-    </div>
-    <div class="pagination" v-else>
+    <div class="pagination">
       <div class="align-center" v-for="p in getTotalPage()" :key="p">
         <span v-if="p != page">
           <router-link
@@ -33,8 +26,6 @@
 <script>
 import EventCard from '@/components/EventCard.vue'
 import EventService from '@/services/EventService.js'
-import { watchEffect } from 'vue'
-import Common from '@/services/Common.js'
 
 export default {
   name: 'EventList',
@@ -45,8 +36,7 @@ export default {
   data() {
     return {
       events: null,
-      totalEvents: 0,
-      showLoader: true
+      totalEvents: 0
     }
   },
   computed: {
@@ -55,19 +45,27 @@ export default {
       return this.page < totalPages
     }
   },
-  created() {
-    watchEffect(() => {
-      this.events = null
-      EventService.getEvents(2, this.page)
-        .then(response => {
-          this.events = response.data
-          this.totalEvents = response.headers['x-total-count']
-          this.showLoader = false
+  beforeRouteEnter(routeTo, routeFrom, next) {
+    EventService.getEvents(2, parseInt(routeTo.query.page) || 1)
+      .then(response => {
+        next(comp => {
+          comp.events = response.data
+          comp.totalEvents = response.headers['x-total-count']
         })
-        .catch(error => {
-          Common.setUrlPath(this.$router, error)
-        })
-    })
+      })
+      .catch(() => {
+        next({ name: 'NetworkError' })
+      })
+  },
+  beforeRouteUpdate(routeTo) {
+    return EventService.getEvents(2, parseInt(routeTo.query.page) || 1)
+      .then(response => {
+        this.events = response.data
+        this.totalEvents = response.headers['x-total-count']
+      })
+      .catch(() => {
+        return { name: 'NetworkError' }
+      })
   },
   methods: {
     isLoading() {
